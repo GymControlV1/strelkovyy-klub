@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Стрелковый клуб</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="club-header">
+        <div>
+          <p class="eyebrow">Закрытый дуэльный клуб</p>
+          <h1>Стрелковый клуб</h1>
+        </div>
+        <div class="round-panel" aria-live="polite">
+          <span>Раунд</span>
+          <strong id="roundNumber">1</strong>
+        </div>
+        <div class="round-panel timer-panel" aria-live="polite">
+          <span>До хода</span>
+          <strong><span id="timerValue">20</span>с</strong>
+        </div>
+      </header>
+
+      <section class="scoreboard" aria-label="Состояние игроков">
+        <article class="fighter-card" id="playerOneCard">
+          <div class="fighter-topline">
+            <div>
+              <p class="fighter-label">Игрок 1</p>
+              <h2>Егерь</h2>
+            </div>
+            <span class="level-badge">Ур. 3</span>
+          </div>
+          <div class="health-row">
+            <span>Здоровье</span>
+            <strong><span id="playerOneHealth">100</span>/100</strong>
+          </div>
+          <div class="health-track">
+            <div class="health-fill" id="playerOneHealthFill"></div>
+          </div>
+          <dl class="loadout">
+            <div>
+              <dt>Оружие</dt>
+              <dd id="playerOneWeaponName">Дробовик</dd>
+            </div>
+            <div>
+              <dt>Броня</dt>
+              <dd>Бронежилет I</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="fighter-card" id="playerTwoCard">
+          <div class="fighter-topline">
+            <div>
+              <p class="fighter-label">Игрок 2</p>
+              <h2>Стрелок</h2>
+            </div>
+            <span class="level-badge">Ур. 3</span>
+          </div>
+          <div class="health-row">
+            <span>Здоровье</span>
+            <strong><span id="playerTwoHealth">100</span>/100</strong>
+          </div>
+          <div class="health-track">
+            <div class="health-fill" id="playerTwoHealthFill"></div>
+          </div>
+          <dl class="loadout">
+            <div>
+              <dt>Оружие</dt>
+              <dd id="playerTwoWeaponName">Полуавтоматический пистолет</dd>
+            </div>
+            <div>
+              <dt>Броня</dt>
+              <dd>Шлем I</dd>
+            </div>
+          </dl>
+        </article>
+      </section>
+
+      <section class="battlefield" aria-label="Поле дуэли">
+        <div class="range-markers">
+          <span>Левый сектор</span>
+          <span>Центр</span>
+          <span>Правый сектор</span>
+        </div>
+        <div class="duel-lane">
+          <div class="fighter-figure fighter-left" id="playerOneFigure">
+            <span class="hat"></span>
+            <span class="body"></span>
+            <span class="rifle"></span>
+          </div>
+          <div class="shot-line" id="shotLineOne"></div>
+          <div class="impact" id="impactOne">-0</div>
+          <div class="center-target"></div>
+          <div class="impact impact-right" id="impactTwo">-0</div>
+          <div class="shot-line shot-line-right" id="shotLineTwo"></div>
+          <div class="fighter-figure fighter-right" id="playerTwoFigure">
+            <span class="hat"></span>
+            <span class="body"></span>
+            <span class="rifle"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls-grid" aria-label="Выбор ходов">
+        <form class="move-card" id="playerOneForm">
+          <div class="move-card-header">
+            <h2>Егерь</h2>
+            <select id="playerOneWeapon" aria-label="Оружие Игрока 1">
+              <option value="shotgun">Дробовик</option>
+              <option value="singlePistol">Пистолет однозарядный</option>
+              <option value="semiPistol">Полуавтоматический пистолет</option>
+              <option value="carbine">Карабин</option>
+            </select>
+          </div>
+
+          <fieldset>
+            <legend>Выстрел</legend>
+            <div class="segmented-control">
+              <input type="radio" name="p1Shoot" id="p1ShootLeft" value="left" />
+              <label for="p1ShootLeft">Влево</label>
+              <input type="radio" name="p1Shoot" id="p1ShootCenter" value="center" checked />
+              <label for="p1ShootCenter">Центр</label>
+              <input type="radio" name="p1Shoot" id="p1ShootRight" value="right" />
+              <label for="p1ShootRight">Вправо</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Уклонение</legend>
+            <div class="segmented-control">
+              <input type="radio" name="p1Dodge" id="p1DodgeLeft" value="left" checked />
+              <label for="p1DodgeLeft">Влево</label>
+              <input type="radio" name="p1Dodge" id="p1DodgeCenter" value="center" />
+              <label for="p1DodgeCenter">Центр</label>
+              <input type="radio" name="p1Dodge" id="p1DodgeRight" value="right" />
+              <label for="p1DodgeRight">Вправо</label>
+            </div>
+          </fieldset>
+        </form>
+
+        <form class="move-card" id="playerTwoForm">
+          <div class="move-card-header">
+            <h2>Стрелок</h2>
+            <select id="playerTwoWeapon" aria-label="Оружие Игрока 2">
+              <option value="semiPistol">Полуавтоматический пистолет</option>
+              <option value="shotgun">Дробовик</option>
+              <option value="singlePistol">Пистолет однозарядный</option>
+              <option value="carbine">Карабин</option>
+            </select>
+          </div>
+
+          <fieldset>
+            <legend>Выстрел</legend>
+            <div class="segmented-control">
+              <input type="radio" name="p2Shoot" id="p2ShootLeft" value="left" />
+              <label for="p2ShootLeft">Влево</label>
+              <input type="radio" name="p2Shoot" id="p2ShootCenter" value="center" />
+              <label for="p2ShootCenter">Центр</label>
+              <input type="radio" name="p2Shoot" id="p2ShootRight" value="right" checked />
+              <label for="p2ShootRight">Вправо</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Уклонение</legend>
+            <div class="segmented-control">
+              <input type="radio" name="p2Dodge" id="p2DodgeLeft" value="left" />
+              <label for="p2DodgeLeft">Влево</label>
+              <input type="radio" name="p2Dodge" id="p2DodgeCenter" value="center" />
+              <label for="p2DodgeCenter">Центр</label>
+              <input type="radio" name="p2Dodge" id="p2DodgeRight" value="right" checked />
+              <label for="p2DodgeRight">Вправо</label>
+            </div>
+          </fieldset>
+        </form>
+      </section>
+
+      <section class="action-row">
+        <button class="primary-button" id="makeMoveButton" type="button">Сделать ход</button>
+        <button class="secondary-button" id="resetButton" type="button">Новый бой</button>
+      </section>
+
+      <section class="log-panel" aria-label="Журнал боя">
+        <div class="log-heading">
+          <h2>Журнал боя</h2>
+          <span id="battleStatus">Бой идет</span>
+        </div>
+        <ol id="battleLog">
+          <li>Бой начался. Оба стрелка заняли позиции.</li>
+        </ol>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
