@@ -46,7 +46,7 @@
             </div>
             <div>
               <dt>Броня</dt>
-              <dd>Бронежилет I</dd>
+              <dd id="playerOneArmorName">Бронежилет I</dd>
             </div>
           </dl>
         </article>
@@ -73,7 +73,7 @@
             </div>
             <div>
               <dt>Броня</dt>
-              <dd>Шлем I</dd>
+              <dd id="playerTwoArmorName">Шлем I</dd>
             </div>
           </dl>
         </article>
@@ -104,92 +104,86 @@
         </div>
       </section>
 
-      <section class="controls-grid" aria-label="Выбор ходов">
-        <form class="move-card" id="playerOneForm">
+      <section class="player-console" aria-label="Панель игрока">
+        <form class="move-card loadout-card" id="loadoutForm">
           <div class="move-card-header">
-            <h2>Егерь</h2>
-            <select id="playerOneWeapon" aria-label="Оружие Игрока 1">
-              <option value="shotgun">Дробовик</option>
-              <option value="singlePistol">Пистолет однозарядный</option>
-              <option value="semiPistol">Полуавтоматический пистолет</option>
-              <option value="carbine">Карабин</option>
-            </select>
+            <div>
+              <p class="fighter-label">Перед боем</p>
+              <h2>Мое снаряжение</h2>
+            </div>
+            <span class="loadout-lock" id="loadoutLock">Можно менять</span>
           </div>
 
-          <fieldset>
-            <legend>Выстрел</legend>
-            <div class="segmented-control">
-              <input type="radio" name="p1Shoot" id="p1ShootLeft" value="left" />
-              <label for="p1ShootLeft">Влево</label>
-              <input type="radio" name="p1Shoot" id="p1ShootCenter" value="center" checked />
-              <label for="p1ShootCenter">Центр</label>
-              <input type="radio" name="p1Shoot" id="p1ShootRight" value="right" />
-              <label for="p1ShootRight">Вправо</label>
-            </div>
-          </fieldset>
+          <div class="loadout-selects">
+            <label class="select-field">
+              <span>Оружие</span>
+              <select id="playerOneWeapon" aria-label="Мое оружие">
+                <option value="shotgun">Дробовик</option>
+                <option value="singlePistol">Пистолет однозарядный</option>
+                <option value="semiPistol">Полуавтоматический пистолет</option>
+                <option value="carbine">Карабин</option>
+              </select>
+            </label>
 
-          <fieldset>
-            <legend>Уклонение</legend>
-            <div class="segmented-control">
-              <input type="radio" name="p1Dodge" id="p1DodgeLeft" value="left" checked />
-              <label for="p1DodgeLeft">Влево</label>
-              <input type="radio" name="p1Dodge" id="p1DodgeCenter" value="center" />
-              <label for="p1DodgeCenter">Центр</label>
-              <input type="radio" name="p1Dodge" id="p1DodgeRight" value="right" />
-              <label for="p1DodgeRight">Вправо</label>
-            </div>
-          </fieldset>
+            <label class="select-field">
+              <span>Броня</span>
+              <select id="playerOneArmor" aria-label="Моя броня">
+                <option value="vestOne">Бронежилет I</option>
+                <option value="helmetOne">Шлем I</option>
+                <option value="none">Без брони</option>
+              </select>
+            </label>
+          </div>
         </form>
 
-        <form class="move-card" id="playerTwoForm">
+        <form class="move-card move-panel" id="playerMoveForm">
           <div class="move-card-header">
-            <h2>Стрелок</h2>
-            <select id="playerTwoWeapon" aria-label="Оружие Игрока 2">
-              <option value="semiPistol">Полуавтоматический пистолет</option>
-              <option value="shotgun">Дробовик</option>
-              <option value="singlePistol">Пистолет однозарядный</option>
-              <option value="carbine">Карабин</option>
-            </select>
+            <div>
+              <p class="fighter-label">Мой ход</p>
+              <h2>Выбор сектора</h2>
+            </div>
+            <span class="hidden-move">Ход соперника скрыт</span>
           </div>
 
           <fieldset>
-            <legend>Выстрел</legend>
+            <legend>Куда стреляю</legend>
             <div class="segmented-control">
-              <input type="radio" name="p2Shoot" id="p2ShootLeft" value="left" />
-              <label for="p2ShootLeft">Влево</label>
-              <input type="radio" name="p2Shoot" id="p2ShootCenter" value="center" />
-              <label for="p2ShootCenter">Центр</label>
-              <input type="radio" name="p2Shoot" id="p2ShootRight" value="right" checked />
-              <label for="p2ShootRight">Вправо</label>
+              <input type="radio" name="playerShoot" id="playerShootLeft" value="left" />
+              <label for="playerShootLeft">Влево</label>
+              <input type="radio" name="playerShoot" id="playerShootCenter" value="center" checked />
+              <label for="playerShootCenter">Центр</label>
+              <input type="radio" name="playerShoot" id="playerShootRight" value="right" />
+              <label for="playerShootRight">Вправо</label>
             </div>
           </fieldset>
 
           <fieldset>
-            <legend>Уклонение</legend>
+            <legend>Куда уворачиваюсь</legend>
             <div class="segmented-control">
-              <input type="radio" name="p2Dodge" id="p2DodgeLeft" value="left" />
-              <label for="p2DodgeLeft">Влево</label>
-              <input type="radio" name="p2Dodge" id="p2DodgeCenter" value="center" />
-              <label for="p2DodgeCenter">Центр</label>
-              <input type="radio" name="p2Dodge" id="p2DodgeRight" value="right" checked />
-              <label for="p2DodgeRight">Вправо</label>
+              <input type="radio" name="playerDodge" id="playerDodgeLeft" value="left" checked />
+              <label for="playerDodgeLeft">Влево</label>
+              <input type="radio" name="playerDodge" id="playerDodgeCenter" value="center" />
+              <label for="playerDodgeCenter">Центр</label>
+              <input type="radio" name="playerDodge" id="playerDodgeRight" value="right" />
+              <label for="playerDodgeRight">Вправо</label>
             </div>
           </fieldset>
         </form>
       </section>
 
       <section class="action-row">
-        <button class="primary-button" id="makeMoveButton" type="button">Сделать ход</button>
+        <button class="secondary-button" id="startBattleButton" type="button">Начать бой</button>
+        <button class="primary-button" id="makeMoveButton" type="button" disabled>Сделать ход</button>
         <button class="secondary-button" id="resetButton" type="button">Новый бой</button>
       </section>
 
       <section class="log-panel" aria-label="Журнал боя">
         <div class="log-heading">
           <h2>Журнал боя</h2>
-          <span id="battleStatus">Бой идет</span>
+          <span id="battleStatus">Ожидание боя</span>
         </div>
         <ol id="battleLog">
-          <li>Бой начался. Оба стрелка заняли позиции.</li>
+          <li>Выберите снаряжение и начните бой.</li>
         </ol>
       </section>
     </main>

@@ -37,18 +37,26 @@ const weapons = {
 };
 
 const armor = {
+  none: {
+    name: "без брони",
+    displayName: "Без брони",
+    reduction: 0,
+  },
   vestOne: {
     name: "бронежилет",
+    displayName: "Бронежилет I",
     reduction: 4,
   },
   helmetOne: {
     name: "шлем",
+    displayName: "Шлем I",
     reduction: 3,
   },
 };
 
 const state = {
   round: 1,
+  battleStarted: false,
   battleOver: false,
   roundSeconds: 20,
   timerId: null,
@@ -58,6 +66,8 @@ const state = {
       name: "Егерь",
       health: 100,
       maxHealth: 100,
+      weaponKey: "shotgun",
+      armorKey: "vestOne",
       armor: armor.vestOne,
     },
     {
@@ -65,6 +75,8 @@ const state = {
       name: "Стрелок",
       health: 100,
       maxHealth: 100,
+      weaponKey: "semiPistol",
+      armorKey: "helmetOne",
       armor: armor.helmetOne,
     },
   ],
@@ -75,8 +87,11 @@ const elements = {
   timerValue: document.querySelector("#timerValue"),
   battleLog: document.querySelector("#battleLog"),
   battleStatus: document.querySelector("#battleStatus"),
+  startBattleButton: document.querySelector("#startBattleButton"),
   makeMoveButton: document.querySelector("#makeMoveButton"),
   resetButton: document.querySelector("#resetButton"),
+  loadoutForm: document.querySelector("#loadoutForm"),
+  loadoutLock: document.querySelector("#loadoutLock"),
   playerOneHealth: document.querySelector("#playerOneHealth"),
   playerTwoHealth: document.querySelector("#playerTwoHealth"),
   playerOneHealthFill: document.querySelector("#playerOneHealthFill"),
@@ -86,9 +101,11 @@ const elements = {
   playerOneFigure: document.querySelector("#playerOneFigure"),
   playerTwoFigure: document.querySelector("#playerTwoFigure"),
   playerOneWeapon: document.querySelector("#playerOneWeapon"),
-  playerTwoWeapon: document.querySelector("#playerTwoWeapon"),
+  playerOneArmor: document.querySelector("#playerOneArmor"),
   playerOneWeaponName: document.querySelector("#playerOneWeaponName"),
   playerTwoWeaponName: document.querySelector("#playerTwoWeaponName"),
+  playerOneArmorName: document.querySelector("#playerOneArmorName"),
+  playerTwoArmorName: document.querySelector("#playerTwoArmorName"),
   shotLineOne: document.querySelector("#shotLineOne"),
   shotLineTwo: document.querySelector("#shotLineTwo"),
   impactOne: document.querySelector("#impactOne"),
@@ -103,16 +120,11 @@ function getMoves() {
   return [
     {
       playerIndex: 0,
-      shoot: getCheckedValue("p1Shoot"),
-      dodge: getCheckedValue("p1Dodge"),
-      weaponKey: elements.playerOneWeapon.value,
+      shoot: getCheckedValue("playerShoot"),
+      dodge: getCheckedValue("playerDodge"),
+      weaponKey: state.players[0].weaponKey,
     },
-    {
-      playerIndex: 1,
-      shoot: getCheckedValue("p2Shoot"),
-      dodge: getCheckedValue("p2Dodge"),
-      weaponKey: elements.playerTwoWeapon.value,
-    },
+    getOpponentMove(),
   ];
 }
 
@@ -122,15 +134,24 @@ function getTimeoutMoves() {
       playerIndex: 0,
       shoot: "none",
       dodge: "center",
-      weaponKey: elements.playerOneWeapon.value,
+      weaponKey: state.players[0].weaponKey,
     },
-    {
-      playerIndex: 1,
-      shoot: "none",
-      dodge: "center",
-      weaponKey: elements.playerTwoWeapon.value,
-    },
+    getOpponentMove(),
   ];
+}
+
+function getOpponentMove() {
+  const sectorKeys = Object.keys(sectors);
+  return {
+    playerIndex: 1,
+    shoot: randomFrom(sectorKeys),
+    dodge: randomFrom(sectorKeys),
+    weaponKey: state.players[1].weaponKey,
+  };
+}
+
+function randomFrom(items) {
+  return items[Math.floor(Math.random() * items.length)];
 }
 
 function applyArmor(damage, target) {
@@ -203,7 +224,7 @@ function buildMissText(attacker, target, move, targetMove, weapon) {
 }
 
 function resolveRound() {
-  if (state.battleOver) {
+  if (!state.battleStarted || state.battleOver) {
     return;
   }
 
@@ -213,12 +234,12 @@ function resolveRound() {
 }
 
 function resolveTimeoutRound() {
-  if (state.battleOver) {
+  if (!state.battleStarted || state.battleOver) {
     return;
   }
 
   stopTimer();
-  prependSystemLog(`Время раунда ${state.round} вышло. Игроки, не подтвердившие ход, остались на месте.`);
+  prependSystemLog(`Время раунда ${state.round} вышло. Егерь остался на месте и не стрелял.`);
   playRound(getTimeoutMoves());
 }
 
@@ -252,6 +273,8 @@ function finishRoundIfNeeded() {
 
   if (p1.health <= 0 || p2.health <= 0) {
     state.battleOver = true;
+    state.battleStarted = false;
+    stopTimer();
     elements.makeMoveButton.disabled = true;
 
     if (p1.health <= 0 && p2.health <= 0) {
@@ -320,8 +343,10 @@ function updateUi() {
   elements.playerTwoHealth.textContent = p2.health;
   updateHealthFill(elements.playerOneHealthFill, p1.health, p1.maxHealth);
   updateHealthFill(elements.playerTwoHealthFill, p2.health, p2.maxHealth);
-  elements.playerOneWeaponName.textContent = weapons[elements.playerOneWeapon.value].name;
-  elements.playerTwoWeaponName.textContent = weapons[elements.playerTwoWeapon.value].name;
+  elements.playerOneWeaponName.textContent = weapons[p1.weaponKey].name;
+  elements.playerTwoWeaponName.textContent = weapons[p2.weaponKey].name;
+  elements.playerOneArmorName.textContent = armor[p1.armorKey].displayName;
+  elements.playerTwoArmorName.textContent = armor[p2.armorKey].displayName;
 }
 
 function updateHealthFill(fill, health, maxHealth) {
@@ -330,24 +355,59 @@ function updateHealthFill(fill, health, maxHealth) {
   fill.classList.toggle("low", percent <= 35);
 }
 
+function startBattle() {
+  if (state.battleStarted) {
+    return;
+  }
+
+  state.battleStarted = true;
+  state.battleOver = false;
+  applySelectedLoadout();
+  lockLoadout(true);
+  elements.battleStatus.textContent = "Бой идет";
+  elements.startBattleButton.disabled = true;
+  elements.makeMoveButton.disabled = false;
+  elements.battleLog.innerHTML = "<li>Бой начался. Снаряжение зафиксировано до конца боя.</li>";
+  startTimer();
+  updateUi();
+}
+
 function resetBattle() {
   state.round = 1;
+  state.battleStarted = false;
   state.battleOver = false;
   stopTimer();
   state.players.forEach((player) => {
     player.health = player.maxHealth;
   });
+  applySelectedLoadout();
+  lockLoadout(false);
 
   elements.roundNumber.textContent = "1";
-  elements.battleStatus.textContent = "Бой идет";
-  elements.makeMoveButton.disabled = false;
-  elements.battleLog.innerHTML = "<li>Бой начался. Оба стрелка заняли позиции.</li>";
+  elements.battleStatus.textContent = "Ожидание боя";
+  elements.startBattleButton.disabled = false;
+  elements.makeMoveButton.disabled = true;
+  elements.battleLog.innerHTML = "<li>Выберите снаряжение и начните бой.</li>";
   elements.playerOneCard.classList.remove("winner", "defeated");
   elements.playerTwoCard.classList.remove("winner", "defeated");
   setDodgeClass(elements.playerOneFigure, "fighter-left", "center");
   setDodgeClass(elements.playerTwoFigure, "fighter-right", "center");
   updateUi();
-  startTimer();
+}
+
+function applySelectedLoadout() {
+  const player = state.players[0];
+  player.weaponKey = elements.playerOneWeapon.value;
+  player.armorKey = elements.playerOneArmor.value;
+  player.armor = armor[player.armorKey];
+}
+
+function lockLoadout(locked) {
+  elements.playerOneWeapon.disabled = locked;
+  elements.playerOneArmor.disabled = locked;
+  elements.loadoutForm.classList.toggle("locked", locked);
+  elements.loadoutLock.classList.toggle("locked", locked);
+  elements.loadoutLock.textContent = locked ? "Зафиксировано" : "Можно менять";
 }
 
 function startTimer() {
@@ -382,10 +442,19 @@ function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+elements.startBattleButton.addEventListener("click", startBattle);
 elements.makeMoveButton.addEventListener("click", resolveRound);
 elements.resetButton.addEventListener("click", resetBattle);
-elements.playerOneWeapon.addEventListener("change", updateUi);
-elements.playerTwoWeapon.addEventListener("change", updateUi);
+elements.playerOneWeapon.addEventListener("change", syncLoadoutPreview);
+elements.playerOneArmor.addEventListener("change", syncLoadoutPreview);
 
-updateUi();
-startTimer();
+function syncLoadoutPreview() {
+  if (state.battleStarted) {
+    return;
+  }
+
+  applySelectedLoadout();
+  updateUi();
+}
+
+resetBattle();
